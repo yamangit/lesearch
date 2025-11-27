@@ -20,7 +20,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y zsync
+        run: sudo apt-get update && sudo apt-get install -y zsync desktop-file-utils
 
       - name: Run tests
         run: cargo test
