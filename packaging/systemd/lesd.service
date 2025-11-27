@@ -1,0 +1,13 @@
+[Unit]
+Description=Lesearch daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/lesd --db-path /var/lib/les/index.db --socket /run/lesd.sock
+Restart=on-failure
+DynamicUser=yes
+StateDirectory=les
+RuntimeDirectory=les
+
+[Install]
+WantedBy=multi-user.target

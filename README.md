@@ -163,6 +163,42 @@ Artifacts land in `target/{debug,release}/les` and `target/{debug,release}/lesd`
 
 ---
 
+## Packaging
+
+Two helper scripts live under `packaging/` and produce distributable artifacts from the release binaries.
+
+### Debian package
+
+Requirements: `dpkg-deb`, `python3`, and a Linux host that matches your target architecture.
+
+```bash
+./packaging/deb/build_deb.sh
+```
+
+The script:
+
+- Builds release binaries.
+- Creates `/usr/bin/les` and `/usr/bin/lesd` entries.
+- Installs a systemd unit at `/usr/lib/systemd/system/lesd.service`.
+- Emits `target/package/lesearch_<version>_<arch>.deb`.
+
+Install with `sudo dpkg -i target/package/lesearch_<version>_<arch>.deb`.
+`dpkg-deb` may warn about rootless builds; pass `--root-owner-group` if you need strict ownership metadata.
+
+### AppImage
+
+Requirements: `appimagetool` in `PATH` (download from <https://github.com/AppImage/AppImageKit/releases>), `python3`, Linux host.
+
+```bash
+./packaging/appimage/build_appimage.sh
+```
+
+- Bundles both `les` and `lesd`.
+- `AppRun` dispatches to `les` by default; call with `lesd` as the first argument to start the daemon inside the AppImage.
+- Produces `target/package/appimage/Lesearch-<version>-<arch>.AppImage`.
+
+---
+
 ## Development & Testing
 
 - `cargo fmt` / `cargo clippy -- -D warnings`
