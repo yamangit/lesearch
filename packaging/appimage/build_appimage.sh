@@ -18,7 +18,10 @@ if ! command -v "$APPIMAGETOOL_BIN" >/dev/null 2>&1; then
     curl -L --fail -o "$TMP_APPIMAGE/appimagetool.AppImage" \
         "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
     chmod +x "$TMP_APPIMAGE/appimagetool.AppImage"
-    "$TMP_APPIMAGE/appimagetool.AppImage" --appimage-extract >/dev/null
+    (
+        cd "$TMP_APPIMAGE"
+        ./appimagetool.AppImage --appimage-extract >/dev/null
+    )
     APPIMAGETOOL_BIN="$TMP_APPIMAGE/squashfs-root/usr/bin/appimagetool"
 fi
 
