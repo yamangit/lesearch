@@ -197,6 +197,8 @@ Requirements: `appimagetool` in `PATH` (download from <https://github.com/AppIma
 - `AppRun` dispatches to `les` by default; call with `lesd` as the first argument to start the daemon inside the AppImage.
 - Produces `target/package/appimage/Lesearch-<version>-<arch>.AppImage`.
 
+GitHub Actions (`.github/workflows/packages.yml`) runs these scripts on every push/PR, uploads the `.deb` and AppImage artifacts, and ensures packaging doesn’t regress.
+
 ---
 
 ## Development & Testing

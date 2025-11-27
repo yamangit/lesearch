@@ -4,9 +4,22 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
 cd "$ROOT_DIR"
 
-if ! command -v appimagetool >/dev/null 2>&1; then
-    echo "appimagetool is required to build the AppImage (https://github.com/AppImage/AppImageKit)" >&2
-    exit 1
+APPIMAGETOOL_BIN="${APPIMAGETOOL:-appimagetool}"
+TMP_APPIMAGE=""
+cleanup() {
+    if [ -n "${TMP_APPIMAGE}" ] && [ -d "${TMP_APPIMAGE}" ]; then
+        rm -rf "${TMP_APPIMAGE}"
+    fi
+}
+
+if ! command -v "$APPIMAGETOOL_BIN" >/dev/null 2>&1; then
+    TMP_APPIMAGE="$(mktemp -d)"
+    trap cleanup EXIT
+    curl -L --fail -o "$TMP_APPIMAGE/appimagetool.AppImage" \
+        "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+    chmod +x "$TMP_APPIMAGE/appimagetool.AppImage"
+    "$TMP_APPIMAGE/appimagetool.AppImage" --appimage-extract >/dev/null
+    APPIMAGETOOL_BIN="$TMP_APPIMAGE/squashfs-root/usr/bin/appimagetool"
 fi
 
 cargo build --release
@@ -53,6 +66,6 @@ Terminal=true
 Categories=Utility;System;
 EOF
 
-APPIMAGE_OUT="$ROOT_DIR/target/package/appimage/Lesearch-${VERSION}-$(uname -m).AppImage"
-appimagetool "$APPDIR" "$APPIMAGE_OUT"
+APPIMAGE_OUT="$ROOT_DIR/target/package/appimage/Lesearch-${VERSION}-${ARCH}.AppImage"
+"$APPIMAGETOOL_BIN" "$APPDIR" "$APPIMAGE_OUT"
 echo "Created $APPIMAGE_OUT"

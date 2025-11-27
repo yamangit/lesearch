@@ -1,0 +1,44 @@
+name: build-packages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y zsync
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Build Debian package
+        run: ./packaging/deb/build_deb.sh
+
+      - name: Build AppImage
+        run: ./packaging/appimage/build_appimage.sh
+
+      - name: Upload Debian artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesearch-deb
+          path: target/package/*.deb
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesearch-appimage
+          path: target/package/appimage/*.AppImage
